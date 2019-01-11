@@ -1,29 +1,13 @@
 <template>
     <div id="Index">
 
-        <div class="chat-list">
-            <div class="chat-item" v-for="item in list">
-
-                <div class="chat-name">
-                    [{{item.name}}]：
-                    <div class="chat-time">
-                        {{item.time}}
-                    </div>
-                </div>
-                <div class="chat-msg">
-                    {{item.msg}}
-                </div>
+        <div class="login-box">
+            <div class="logo-box">
+                <img class="logo" src="@/assets/ctos.png" alt="">
             </div>
-        </div>
-        <div class="hat-tool">
-            <el-input rows="1" autosize v-model="msg" @keydown.enter.native="send">
-                <el-button slot="append" @click="send">
-                    <span>send
-                        <div class="state state-success" v-if="isOpen"></div>
-                        <div class="state state-close" v-if="!isOpen"></div>
-                    </span>
-                </el-button>
-            </el-input>
+            <mu-text-field full-width label="userName" v-model="userName"></mu-text-field>
+            <mu-text-field full-width label="RoomId" v-model="RoomId"></mu-text-field>
+            <mu-button full-width @click="join">join</mu-button>
         </div>
 
     </div>

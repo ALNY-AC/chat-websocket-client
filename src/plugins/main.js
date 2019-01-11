@@ -14,11 +14,15 @@ import './vant.js';
 
 import './element.js';
 
-
-
-
-
 Vue.prototype.$http = Http;
+
+
+import MuseUI from 'muse-ui';
+import 'muse-ui/dist/muse-ui.css';
+Vue.use(MuseUI);
+
+
+
 
 
 
