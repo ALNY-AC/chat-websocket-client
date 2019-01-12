@@ -10,7 +10,7 @@ export default {
             list: [],
             userName: this.$route.query.userName,
             roomId: this.$route.query.roomId,
-            msg: this.$getNonceStr('lorem'),
+            msg: '',
             scrollTimer: null,
             isMe: 'left'
         };
@@ -49,7 +49,7 @@ export default {
                 userName: this.userName,
                 msg: this.msg
             });
-            this.msg = this.$getNonceStr('lorem');
+            this.msg = ''
 
 
         },
@@ -60,8 +60,6 @@ export default {
                 userName: this.userName,
                 msg: '进入房间'
             });
-
-            this.send();
         },
         onclose() {
             this.isOpen = false;
