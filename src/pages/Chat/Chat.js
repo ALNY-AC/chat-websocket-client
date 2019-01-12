@@ -1,79 +1,118 @@
+import OriginWebSocket from "../../modus/WebSocket/OriginWebSocket";
+import Component from "../../modus/WebSocket/Component";
+
 export default {
     name: 'Chat',
     data() {
         return {
-            msg: '',
             ws: null,
             isOpen: false,
             list: [],
-            name: this.$route.query.userName,
-            RoomId: this.$route.query.RoomId,
+            userName: this.$route.query.userName,
+            roomId: this.$route.query.roomId,
+            msg: this.$getNonceStr('lorem'),
+            scrollTimer: null,
+            isMe: 'left'
         };
     },
     methods: {
         // 用于初始化一些数据
         init() {
-         this.ws = new WebSocket('ws://106.15.187.65:12138');
-        //  this.ws = new WebSocket('ws://127.0.0.1:12138');
-         this.ws.onopen = this.onopen;
-         this.ws.onclose = this.onclose;
-         this.ws.onerror = this.onerror;
-         this.ws.onmessage = this.onmessage;
+            //  this.ws = new WebSocket('ws://106.15.187.65:12138');
+            let ws = new OriginWebSocket('ws://127.0.0.1:12138');
+
+            ws.on('open', this.onopen);
+            ws.on('close', this.onclose);
+            ws.on('error', this.onerror);
+            ws.on('message', this.onmessage);
+
+            ws.open();
+
+            ws.addComponent('send', new Component((res) => {
+                this.info(res);
+            }));
+            ws.addComponent('userExit', new Component((res) => {
+                this.info(res);
+            }));
+
+            this.ws = ws;
+
+        },
+        send() {
+            if (this.msg.length <= 0) {
+                this.$toast('消息不能为空！');
+                return;
+            }
+
+            this.ws.send('Room/send', 'send', {
+                roomId: this.roomId,
+                userName: this.userName,
+                msg: this.msg
+            });
+            this.msg = this.$getNonceStr('lorem');
+
+
         },
         onopen() {
             this.isOpen = true;
-            let msg = {
-                type: 'addRoom',//类型
-                roomId: this.RoomId,//房间号
-                data: {},//扩展参数
-                userInfo: {
-                    userId: '',
-                    userName: this.name,
-                },
-                message: '',//发来的消息
-            }
-            msg = JSON.stringify(msg);
-            this.ws.send(msg);
+            this.ws.send('Room/send', 'send', {
+                roomId: this.roomId,
+                userName: this.userName,
+                msg: '进入房间'
+            });
+
+            this.send();
         },
         onclose() {
             this.isOpen = false;
-            this.$notify({
-                title: '提示',
-                message: '服务器关闭'
-            });
         },
         onerror() {
             this.isOpen = false;
-            this.$notify({
-                title: '提示',
-                message: '连接出错'
-            });
         },
-        send() {
-            let msg = {
-                type: 'send',//类型
-                roomId: this.RoomId,//房间号
-                data: {},//扩展参数
-                userInfo: {
-                    userId: '',
-                    userName: this.name,
-                },
-                message: this.msg,//发来的消息
-            }
-            msg = JSON.stringify(msg);
-            this.ws.send(msg);
-            this.msg = '';
+        info(res) {
+            res.id = Math.random();
+            this.setIsMe(res.userName);
+            this.list.push(res);
+        },
+        setIsMe(userName) {
+            this.isMe = userName == this.userName ? 'right' : 'left'
         },
         onmessage(e) {
-            this.list.push(JSON.parse(e.data));
-            this.$nextTick(() => {
-                var ele = document.querySelector('.chat-list');
-                ele.scrollTop = ele.scrollHeight;
-            });
+            this.updateView();
         },
+        updateView() {
+            console.warn('updateView');
+            const ScrollTop = (number = 0, time) => {
+                if (!time) {
+                    document.body.scrollTop = document.documentElement.scrollTop = number;
+                    return number;
+                }
+                const spacingTime = 20; // 设置循环的间隔时间  值越小消耗性能越高
+                let spacingInex = time / spacingTime; // 计算循环的次数
+                let nowTop = document.body.scrollTop + document.documentElement.scrollTop; // 获取当前滚动条位置
+                let everTop = (number - nowTop) / spacingInex; // 计算每次滑动的距离
+                this.scrollTimer = setInterval(() => {
+                    if (spacingInex > 0) {
+                        spacingInex--;
+                        ScrollTop(nowTop += everTop);
+                    } else {
+                        clearInterval(this.scrollTimer); // 清除计时器
+                    }
+                }, spacingTime);
+            };
+
+            this.$nextTick(() => {
+                clearInterval(this.scrollTimer); // 清除计时器
+                var ele = document.documentElement;
+                ScrollTop(ele.scrollHeight, 700);
+                // ele.scrollTop = ele.scrollHeight;
+
+            });
+        }
     },
     // 计算属性
-    computed: {},
+    computed: {
+    },
     // 包含 Vue 实例可用过滤器的哈希表。
     filters: {},
     // 在实例创建完成后被立即调用

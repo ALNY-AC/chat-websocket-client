@@ -1,26 +1,32 @@
 export default {
-    name: 'index',
+    name: 'ChatCard',
+    props: {
+        info: {
+            type: Object,
+            default: null
+        }
+    },
     data() {
         return {
-            userName: '',
-            roomId: '',
+            open: false,
         };
     },
     methods: {
-        join() {
-
-            this.$router.push({
-                path: '/Chat/Chat',
-                query: {
-                    userName: this.userName,
-                    roomId: this.roomId,
-                }
-            })
-
+        // 用于初始化一些数据
+        init() { },
+        // 用于更新一些数据
+        update() { },
+        remove() {
+            this.open = false;
+            this.$emit('on-remove', this.info);
         }
     },
     // 计算属性
-    computed: {},
+    computed: {
+        isMe() {
+            return this.info.userName == this.$route.query.userName;
+        }
+    },
     // 包含 Vue 实例可用过滤器的哈希表。
     filters: {},
     // 在实例创建完成后被立即调用
@@ -41,7 +47,7 @@ export default {
     beforeDestroy() { },
     //Vue 实例销毁后调用。
     destroyed() { },
-    // 当捕获一个来自子孙组件的错误时被调用。此
+    // 当捕获一个来自子孙组件的错误时被调用。
     errorCaptured() { },
     // 包含 Vue 实例可用指令的哈希表。
     directives: {},

@@ -6,7 +6,7 @@
                 <img class="logo" src="@/assets/ctos.png" alt="">
             </div>
             <mu-text-field full-width label="userName" v-model="userName"></mu-text-field>
-            <mu-text-field full-width label="RoomId" v-model="RoomId"></mu-text-field>
+            <mu-text-field full-width label="roomId" v-model="roomId"></mu-text-field>
             <mu-button full-width @click="join">join</mu-button>
         </div>
 
