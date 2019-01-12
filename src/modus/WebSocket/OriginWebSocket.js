@@ -26,6 +26,7 @@ class OriginWebSocket {
     }
     onmessage(e) {
         let data = JSON.parse(e.data)
+
         if (!data['component']) {
             console.warn("接口并未返回组件名：", data);
         } else {
@@ -37,7 +38,7 @@ class OriginWebSocket {
             }
         }
         if (this.callbacks['onmessage']) {
-            this.callbacks['onmessage'](e)
+            this.callbacks['onmessage'](data)
         }
     }
     send(path = '', component = '', data = {}) {

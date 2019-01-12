@@ -3,7 +3,12 @@
     <div class="chat-body clearfix">
       <transition-group :name="isMe" tag="div">
         <template v-for="(item,i) in list">
-          <chat-card :info="item" :key="item.id" @on-remove="setIsMe(item.userName),list.splice(i,1)"></chat-card>
+          <chat-card v-if="item.type=='msg'" :info="item" :key="item.id" @on-remove="remove(item,i)"></chat-card>
+          <div class="time-box" v-if="item.type=='time'" :info="item" :key="item.id">
+            <div class="time">
+              {{item.msg}}
+            </div>
+          </div>
         </template>
       </transition-group>
     </div>

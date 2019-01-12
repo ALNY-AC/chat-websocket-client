@@ -3,12 +3,15 @@
     margin-bottom: 20px;
     box-sizing: border-box;
     transition: all 0.3s;
+    position: relative;
+    width: 100%;
     * {
         box-sizing: border-box;
     }
     .chat-user-info {
         margin-right: 10px;
         z-index: 2;
+        text-align: center;
         .user-head {
             display: inline-block;
             img {
@@ -18,12 +21,16 @@
             }
         }
     }
+    .tool {
+        line-height: 1;
+    }
     .user-name {
         color: #777;
     }
     .chat-msg {
         margin-right: 50px;
         z-index: 1;
+        position: relative;
         .chat-msg-box {
             color: #777;
             border-radius: 10px;
@@ -40,10 +47,6 @@
                 font-size: 11px;
                 line-height: 1;
                 color: #aaa;
-                .tool {
-                    float: right;
-                    margin-left: 10px;
-                }
             }
         }
     }
@@ -69,11 +72,6 @@
                     text-align: right;
                     border-top: 1px solid rgb(57, 160, 120);
                     color: rgba($color: #eee, $alpha: 0.9);
-                    .tool {
-                        float: left;
-                        margin-left: 0;
-                        margin-right: 10px;
-                    }
                 }
             }
         }

@@ -12,7 +12,8 @@ export default {
             roomId: this.$route.query.roomId,
             msg: '',
             scrollTimer: null,
-            isMe: 'left'
+            isMe: 'left',
+            endTime: 0,
         };
     },
     methods: {
@@ -38,12 +39,17 @@ export default {
             this.ws = ws;
 
         },
+        remove(item, i) {
+            this.setIsMe(item.userName);
+            this.$nextTick(() => {
+                this.list.splice(i, 1);
+            });
+        },
         send() {
             if (this.msg.length <= 0) {
                 this.$toast('消息不能为空！');
                 return;
             }
-
             this.ws.send('Room/send', 'send', {
                 roomId: this.roomId,
                 userName: this.userName,
@@ -69,17 +75,29 @@ export default {
         },
         info(res) {
             res.id = Math.random();
-            this.setIsMe(res.userName);
+            res.type = 'msg';
+
+            // 判断是否显示时间
+            if (res.uninxTime - this.endTime >= 30) {
+                this.list.push({
+                    type: 'time',
+                    msg: res.time,
+                    id: Math.random(),
+                });
+                this.isMe = "fide";
+                this.endTime = res.uninxTime;
+            } else {
+                this.setIsMe(res.userName);
+            }
             this.list.push(res);
         },
         setIsMe(userName) {
             this.isMe = userName == this.userName ? 'right' : 'left'
         },
-        onmessage(e) {
+        onmessage(data) {
             this.updateView();
         },
         updateView() {
-            console.warn('updateView');
             const ScrollTop = (number = 0, time) => {
                 if (!time) {
                     document.body.scrollTop = document.documentElement.scrollTop = number;
@@ -104,7 +122,6 @@ export default {
                 var ele = document.documentElement;
                 ScrollTop(ele.scrollHeight, 700);
                 // ele.scrollTop = ele.scrollHeight;
-
             });
         }
     },
