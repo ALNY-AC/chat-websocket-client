@@ -18,8 +18,8 @@ export default {
     methods: {
         // 用于初始化一些数据
         init() {
-            //  this.ws = new WebSocket('ws://106.15.187.65:12138');
-            let ws = new OriginWebSocket('ws://127.0.0.1:12138');
+            let ws = new OriginWebSocket('ws://106.15.187.65:12138');
+            // let ws = new OriginWebSocket('ws://127.0.0.1:12138');
 
             ws.on('open', this.onopen);
             ws.on('close', this.onclose);
