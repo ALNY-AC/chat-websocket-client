@@ -39,6 +39,54 @@ export default {
             this.ws = ws;
 
         },
+        onRead(f, c) {
+            function compress(base64String, w, quality) {
+                var getMimeType = function (urlData) {
+                    var arr = urlData.split(',');
+                    var mime = arr[0].match(/:(.*?);/)[1];
+                    // return mime.replace("image/", "");
+                    return mime;
+                };
+                var newImage = new Image();
+                var imgWidth, imgHeight;
+
+                var promise = new Promise(resolve => newImage.onload = resolve);
+                newImage.src = base64String;
+                return promise.then(() => {
+                    imgWidth = newImage.width;
+                    imgHeight = newImage.height;
+                    var canvas = document.createElement("canvas");
+                    var ctx = canvas.getContext("2d");
+                    if (Math.max(imgWidth, imgHeight) > w) {
+                        if (imgWidth > imgHeight) {
+                            canvas.width = w;
+                            canvas.height = w * imgHeight / imgWidth;
+                        } else {
+                            canvas.height = w;
+                            canvas.width = w * imgWidth / imgHeight;
+                        }
+                    } else {
+                        canvas.width = imgWidth;
+                        canvas.height = imgHeight;
+                    }
+                    ctx.clearRect(0, 0, canvas.width, canvas.height);
+                    ctx.drawImage(newImage, 0, 0, canvas.width, canvas.height);
+                    var base64 = canvas.toDataURL(getMimeType(base64String), quality);
+                    return base64;
+                });
+            }
+
+            compress(f.content, 800, 0.5).then((val) => {
+                this.ws.send('Room/send', 'send', {
+                    roomId: this.roomId,
+                    userName: this.userName,
+                    msg: val,
+                    type: 'msg',
+                    msgType: 'image'
+                });
+            });
+
+        },
         remove(item, i) {
             this.setIsMe(item.userName);
             this.$nextTick(() => {
@@ -50,18 +98,41 @@ export default {
                 this.$toast('消息不能为空！');
                 return;
             }
-            this.ws.send('Room/send', 'send', {
-                roomId: this.roomId,
-                userName: this.userName,
-                msg: this.msg
-            });
-            this.msg = ''
+            if (this.msg.length > 255) {
+                this.ws.send('Room/send', 'send', {
+                    type: 'msg',
+                    msgType: 'text',
+                    roomId: this.roomId,
+                    userName: this.userName,
+                    msg: this.msg.substr(0, 255)
+                });
+                this.ws.send('Room/send', 'send', {
+                    type: 'msg',
+                    msgType: 'text',
+                    roomId: this.roomId,
+                    userName: this.userName,
+                    msg: this.msg.substr(255, this.msg.length - 255)
+                });
+            } else {
+                this.ws.send('Room/send', 'send', {
+                    type: 'msg',
+                    msgType: 'text',
+                    roomId: this.roomId,
+                    userName: this.userName,
+                    msg: this.msg
+                });
+            }
+
+            this.msg = '';
+            document.getElementById('msgInput').focus();
 
 
         },
         onopen() {
             this.isOpen = true;
             this.ws.send('Room/send', 'send', {
+                type: 'msg',
+                msgType: 'text',
                 roomId: this.roomId,
                 userName: this.userName,
                 msg: '进入房间'
@@ -75,21 +146,23 @@ export default {
         },
         info(res) {
             res.id = Math.random();
-            res.type = 'msg';
+            // res.type = 'msg';
 
             // 判断是否显示时间
             if (res.uninxTime - this.endTime >= 30) {
+                this.isMe = "fide";
                 this.list.push({
                     type: 'time',
                     msg: res.time,
                     id: Math.random(),
                 });
-                this.isMe = "fide";
                 this.endTime = res.uninxTime;
-            } else {
-                this.setIsMe(res.userName);
             }
-            this.list.push(res);
+
+            this.$nextTick(() => {
+                this.setIsMe(res.userName);
+                this.list.push(res);
+            });
         },
         setIsMe(userName) {
             this.isMe = userName == this.userName ? 'right' : 'left'

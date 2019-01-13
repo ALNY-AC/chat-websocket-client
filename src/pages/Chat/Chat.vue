@@ -13,7 +13,10 @@
       </transition-group>
     </div>
     <div class="chat-input-box">
-      <input type="text" v-model="msg">
+      <van-uploader :after-read="onRead" style="margin-right:8px">
+        <van-icon name="photograph" class="img-icon" />
+      </van-uploader>
+      <input type="text" id="msgInput" @keydown.enter="send" v-model="msg">
       <button class="button" @click="send">发送</button>
     </div>
 

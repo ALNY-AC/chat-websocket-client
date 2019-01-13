@@ -9,6 +9,7 @@ export default {
     data() {
         return {
             open: false,
+            showImg: false,
         };
     },
     methods: {

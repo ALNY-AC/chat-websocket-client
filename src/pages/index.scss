@@ -1,16 +1,44 @@
 #Index {
-    .login-box {
-        width: 80%;
-        margin: 0 auto;
-        margin-top: 100px;
+    .app-name {
+        color: #aaa;
+        position: fixed;
+        bottom: 10px;
+        text-align: center;
+        right: 0;
+        left: 0;
+    }
+    .head {
+        background-color: #38AC7F;
+        height: 40vh;
     }
     .logo-box {
         text-align: center;
+        transform: translate3d(0, -200px, 0);
         .logo {
-            width: 27%;
-            height: 27%;
             display: inline-block;
+            color: #fff;
+            font-size: 50px;
         }
+    }
+    .login-box {
+        .login-panel {
+            padding: 50px;
+            margin: 0 auto;
+            margin-top: -150px;
+            width: 80%;
+            background-color: #ffffff;
+            border-radius: 25px;
+            box-shadow: 10px 10px 50px rgba($color: #38AC7F, $alpha: 0.2);
+        }
+    }
+}
+
+.btn-box {
+    text-align: center;
+    margin-top: 20px;
+    .mu-raised-button {
+        border-radius: 25px;
+        width: 80%;
     }
 }
 
