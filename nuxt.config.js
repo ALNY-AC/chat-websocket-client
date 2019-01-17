@@ -2,6 +2,9 @@ module.exports = {
     router: {
         middleware: 'auth'
     },
+    env: {
+        baseUrl: './',
+    },
     mode: 'spa',
     srcDir: 'src/',
     build: {
